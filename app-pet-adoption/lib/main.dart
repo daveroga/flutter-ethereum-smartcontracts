@@ -139,9 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
       itemCount: 16,
       itemBuilder: (BuildContext context, int index) {
         return Container(
-            height: 90,
-            child: Center(
-                child: Row(children: [
+            height: 100,
+            child: Row(children: [
               Icon(
                 Icons.pets,
                 size: 40,
@@ -184,7 +183,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         lastTransactionHash = result;
                       });
                     }),
-                SizedBox(height: 20),
                 TextButton(
                     style: TextButton.styleFrom(
                         primary: Colors.black,
@@ -197,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                     }),
               ])
-            ])));
+            ]));
       },
       separatorBuilder: (BuildContext context, int index) => const Divider(),
     );
