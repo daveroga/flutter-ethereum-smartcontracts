@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<DeployedContract> loadContract() async {
     String abiCode = await rootBundle.loadString("assets/abi.json");
     String contractAddress =
-        "0x48a56959C0BC8d185A17bdD64B7bC71b7697b55a"; // contract address PetAdoption
+        "0x5F005f2A0d045E3230086C0Da3d3cC659545501e"; // contract address PetAdoption
 
     final contract = DeployedContract(
         ContractAbi.fromJson(abiCode, "PetAdoption"),
@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<String> submit(String functionName, List<dynamic> args) async {
     EthPrivateKey credentials = EthPrivateKey.fromHex(
-        "afdec86569b627e4cf4c7dea62eb41d864f01f06ad900d2e9636737cf6d36aa4");
+        "deb93fc69adc21bfb2039fb9110a26223ad069df8a7a09ac74b5f0d450f33706");
 
     DeployedContract contract = await loadContract();
 
@@ -103,6 +103,15 @@ class _MyHomePageState extends State<MyHomePage> {
     var bigPettId = BigInt.from(petId);
     // adopt transaction
     var response = await submit("adopt", [bigPettId]);
+    // hash of the transaction
+    return response;
+  }
+
+  Future<String> returnToShelter(int petId) async {
+    // uint in smart contract means BigInt for us
+    var bigPettId = BigInt.from(petId);
+    // adopt transaction
+    var response = await submit("returnToShelter", [bigPettId]);
     // hash of the transaction
     return response;
   }
@@ -163,16 +172,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               )),
               SizedBox(width: 10),
-              TextButton(
-                  style: TextButton.styleFrom(
-                      primary: Colors.white, backgroundColor: Colors.blue),
-                  child: Text('Adopt'),
-                  onPressed: () async {
-                    var result = await adopt(index);
-                    setState(() {
-                      lastTransactionHash = result;
-                    });
-                  })
+              Column(children: [
+                TextButton(
+                    style: TextButton.styleFrom(
+                        primary: Colors.black,
+                        backgroundColor: Colors.greenAccent),
+                    child: Text('Adopt'),
+                    onPressed: () async {
+                      var result = await adopt(index);
+                      setState(() {
+                        lastTransactionHash = result;
+                      });
+                    }),
+                SizedBox(height: 20),
+                TextButton(
+                    style: TextButton.styleFrom(
+                        primary: Colors.black,
+                        backgroundColor: Colors.redAccent),
+                    child: Text('Return'),
+                    onPressed: () async {
+                      var result = await returnToShelter(index);
+                      setState(() {
+                        lastTransactionHash = result;
+                      });
+                    }),
+              ])
             ])));
       },
       separatorBuilder: (BuildContext context, int index) => const Divider(),
