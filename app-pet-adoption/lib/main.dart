@@ -128,76 +128,71 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: buildshelters(),
+      body: buildShelters(),
     );
   }
 
-  @override
-  Widget buildshelters() {
-    return ListView.separated(
-      padding: const EdgeInsets.all(8),
-      itemCount: 16,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-            height: 100,
-            child: Row(children: [
-              Icon(
-                Icons.pets,
-                size: 40,
-                color: Colors.blueGrey,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                  child: FutureBuilder(
-                future: getAdopter(index),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                              child: Text('Adopter ${index}',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold))),
-                          Text('Owner: ${snapshot.data[0]}'),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text('Timestamp: ${snapshot.data[1]}'),
-                        ]);
-                  } else
-                    return Text('Loading...');
-                },
-              )),
-              SizedBox(width: 10),
-              Column(children: [
-                TextButton(
-                    style: TextButton.styleFrom(
-                        primary: Colors.black,
-                        backgroundColor: Colors.greenAccent),
-                    child: Text('Adopt'),
-                    onPressed: () async {
-                      var result = await adopt(index);
-                      setState(() {
-                        lastTransactionHash = result;
-                      });
-                    }),
-                TextButton(
-                    style: TextButton.styleFrom(
-                        primary: Colors.black,
-                        backgroundColor: Colors.redAccent),
-                    child: Text('Return'),
-                    onPressed: () async {
-                      var result = await returnToShelter(index);
-                      setState(() {
-                        lastTransactionHash = result;
-                      });
-                    }),
-              ])
-            ]));
-      },
-      separatorBuilder: (BuildContext context, int index) => const Divider(),
-    );
+  Widget buildShelters() {
+    return Container(
+        child: Column(children: [
+      Container(
+          width: double.infinity,
+          color: Colors.blueGrey,
+          padding: EdgeInsets.all(20),
+          child: Text(
+            "LAST TX HASH: ${lastTransactionHash != null ? lastTransactionHash : ''}",
+            style: TextStyle(color: Colors.white),
+          )),
+      Expanded(
+          child: ListView.builder(
+              reverse: false,
+              padding: const EdgeInsets.all(8),
+              itemCount: 16,
+              itemBuilder: (BuildContext context, int index) {
+                return buildShelter(index);
+              }))
+    ]));
+  }
+
+  Widget buildShelter(int index) {
+    return Card(
+        child: FutureBuilder(
+            future: getAdopter(index),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Container(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Column(children: <Widget>[
+                      ListTile(
+                        title: Text("Pet ${index}"),
+                        subtitle: Text(
+                            "Owner: ${snapshot.data[0]}\nTimestamp: ${snapshot.data[1]}"),
+                      ),
+                      ButtonBar(children: <Widget>[
+                        TextButton(
+                          child: const Text('Adopt'),
+                          style: TextButton.styleFrom(primary: Colors.green),
+                          onPressed: () async {
+                            var result = await adopt(index);
+                            setState(() {
+                              lastTransactionHash = result;
+                            });
+                          },
+                        ),
+                        TextButton(
+                            child: const Text('Return'),
+                            style: TextButton.styleFrom(primary: Colors.red),
+                            onPressed: () async {
+                              var result = await returnToShelter(index);
+                              setState(() {
+                                lastTransactionHash = result;
+                              });
+                            })
+                      ])
+                    ]));
+              } else {
+                return Container(height: 120, child: Text('Loading...'));
+              }
+            }));
   }
 }
